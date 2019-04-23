@@ -7,8 +7,6 @@ const EXIT_MESSAGES = {
   OBJECT_NOT_IMAGE: "Object is not an image, ignoring."
 };
 
-admin.initializeApp(functions.config().firebase);
-
 exports.afterImageUpload = functions.storage.object().onFinalize(object => {
   if (!object) return console.log(EXIT_MESSAGES.OBJECT_DOESNT_EXIST);
   if (!isObjectImage(object))

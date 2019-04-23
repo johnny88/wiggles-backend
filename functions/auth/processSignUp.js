@@ -1,8 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
-admin.initializeApp(functions.config().firebase);
-
 const emailWhitelist = ["jpangs88@gmail.com", "susannebjorkblom@hotmail.com"];
 const emailInWhiteList = ({ email, emailVerified }) =>
   email && emailWhitelist.includes(email) && emailVerified;
