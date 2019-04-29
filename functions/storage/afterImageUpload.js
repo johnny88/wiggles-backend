@@ -99,8 +99,6 @@ const convertImage = async (object, prefix, thumbnail = false) => {
 
   const metadata = {
     contentType: contentType,
-    // To enable Client-side caching you can set the Cache-Control headers here. Uncomment below.
-    "Cache-Control": `public,max-age=${60 * 60 * 24 * 30}`
   };
 
   // Create the temp directory where the storage file will be downloaded.
