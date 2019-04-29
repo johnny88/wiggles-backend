@@ -54,8 +54,11 @@ exports.afterImageUpload = functions.storage
       contentType: object.contentType,
       userId: object.metadata.userId,
       timestamp,
-      status: statusMessages.GENERATING_THUMBNAIL_IMAGE,
       uploadFinished: false
+    });
+
+    imageRef.update({
+      status: statusMessages.GENERATING_THUMBNAIL_IMAGE,
     });
 
     const thumbnail = await convertImage(object, THUMB_PREFIX, true);
