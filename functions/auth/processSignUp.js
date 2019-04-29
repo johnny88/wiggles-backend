@@ -11,7 +11,17 @@ exports.processSignUp = functions.auth.user().onCreate(async user => {
     return console.log(`${user.email} not in whitelist, exiting early.`);
   const customClaims = { authorized: true };
   try {
-    console.log("Email in whitelist, adding claims.");
+    console.log("Email in whitelist, creating account.");
+    
+    const accountRef = admin.database().ref(`account/${user.uid}`);
+    accountRef.set({
+      id: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL
+    });
+
+    console.log("Adding custom claims.");
     await admin.auth().setCustomUserClaims(user.uid, customClaims);
     const metadataRef = admin.database().ref("metadata/" + user.uid);
     return metadataRef.set({ refreshTime: new Date().getTime() });
