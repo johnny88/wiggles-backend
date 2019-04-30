@@ -13,7 +13,7 @@ exports.processSignUp = functions.auth.user().onCreate(async user => {
   try {
     console.log("Email in whitelist, creating account.");
     
-    const accountRef = admin.database().ref(`account/${user.uid}`);
+    const accountRef = admin.database().ref(`accounts/${user.uid}`);
     accountRef.set({
       id: user.uid,
       displayName: user.displayName,

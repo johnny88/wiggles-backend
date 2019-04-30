@@ -1,11 +1,9 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const mkdirp = require("mkdirp-promise");
-const spawn = require("child-process-promise").spawn;
-const os = require("os");
-const fs = require("fs");
 const uuidv4 = require("uuid/v4");
 const path = require("path");
+
+const convertImage = require("./convertImage").convertImage;
 
 const exitMessages = {
   OBJECT_DOESNT_EXIST: "Image object does not exist, exiting early.",
@@ -14,17 +12,9 @@ const exitMessages = {
 };
 
 const statusMessages = {
-  GENERATING_WEB_IMAGE: "Generating web image",
-  GENERATING_THUMBNAIL_IMAGE: "Generating thumbnail image",
+  GENERATING_IMAGES: "Generating display images",
   FINISHED: "Finished"
 };
-
-// Max height and width of the thumbnail in pixels.
-const THUMB_MAX_HEIGHT = 200;
-const THUMB_MAX_WIDTH = 200;
-
-const WEB_MAX_HEIGHT = 1080;
-const WEB_MAX_WIDTH = 1080;
 
 // Prefixes.
 const THUMB_PREFIX = "thumb_";
@@ -58,18 +48,15 @@ exports.afterImageUpload = functions.storage
     });
 
     imageRef.update({
-      status: statusMessages.GENERATING_THUMBNAIL_IMAGE,
+      status: statusMessages.GENERATING_IMAGES
     });
 
-    const thumbnail = await convertImage(object, THUMB_PREFIX, true);
-    if (!thumbnail) return;
+    const [web, thumbnail] = await Promise.all([
+      convertImage(object, WEB_PREFIX),
+      convertImage(object, THUMB_PREFIX, true)
+    ]);
 
-    imageRef.update({
-      status: statusMessages.GENERATING_WEB_IMAGE
-    });
-
-    const web = await convertImage(object, WEB_PREFIX);
-    if (!web) return;
+    if (!thumbnail || !web) return;
 
     return imageRef.update({
       thumbnail,
@@ -83,62 +70,3 @@ const isObjectImage = ({ contentType }) => contentType.startsWith("image/");
 
 const startsWithPrefix = (prefixes, fileName) =>
   prefixes.some(prefix => fileName.startsWith(prefix));
-
-const convertImage = async (object, prefix, thumbnail = false) => {
-  // File and directory paths.
-  const filePath = object.name;
-  const contentType = object.contentType; // This is the image MIME type
-  const fileDir = path.dirname(filePath);
-  const fileName = path.basename(filePath);
-  const convertFilePath = path.normalize(
-    path.join(fileDir, `${prefix}${fileName}`)
-  );
-  const tempLocalFile = path.join(os.tmpdir(), filePath);
-  const tempLocalDir = path.dirname(tempLocalFile);
-  const tempLocalConvertFile = path.join(os.tmpdir(), convertFilePath);
-
-  const bucket = admin.storage().bucket(object.bucket);
-  const file = bucket.file(filePath);
-
-  const metadata = {
-    contentType: contentType,
-  };
-
-  // Create the temp directory where the storage file will be downloaded.
-  await mkdirp(tempLocalDir);
-
-  // Download file from bucket.
-  await file.download({ destination: tempLocalFile });
-  console.log("The file has been downloaded to", tempLocalFile);
-
-  const args = thumbnail
-    ? [
-        tempLocalFile,
-        "-thumbnail",
-        `${THUMB_MAX_WIDTH}x${THUMB_MAX_HEIGHT}>`,
-        tempLocalConvertFile
-      ]
-    : [
-        tempLocalFile,
-        "-resize",
-        `${WEB_MAX_WIDTH}x${WEB_MAX_HEIGHT}>`,
-        tempLocalConvertFile
-      ];
-
-  // Generate a thumbnail using ImageMagick.
-  await spawn("convert", args, { capture: ["stdout", "stderr"] });
-  console.log("Thumbnail created at", tempLocalConvertFile);
-
-  // Uploading the Thumbnail.
-  await bucket.upload(tempLocalConvertFile, {
-    destination: convertFilePath,
-    metadata: metadata
-  });
-  console.log("Thumbnail uploaded to Storage at", convertFilePath);
-
-  // Once the image has been uploaded delete the local files to free up disk space.
-  fs.unlinkSync(tempLocalFile);
-  fs.unlinkSync(tempLocalConvertFile);
-
-  return convertFilePath;
-};
