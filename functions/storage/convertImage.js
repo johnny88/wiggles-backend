@@ -29,7 +29,8 @@ exports.convertImage = async (object, prefix, thumbnail = false) => {
   const file = bucket.file(filePath);
 
   const metadata = {
-    contentType: contentType
+    contentType: contentType,
+    cacheControl: "public,max-age=31536000"
   };
 
   // Create the temp directory where the storage file will be downloaded.

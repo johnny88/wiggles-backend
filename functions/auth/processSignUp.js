@@ -1,7 +1,12 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
-const emailWhitelist = ["jpangs88@gmail.com", "susannebjorkblom@hotmail.com"];
+const emailWhitelist = [
+  "jpangs88@gmail.com",
+  "susannebjorkblom@hotmail.com",
+  "lndpangalos@gmail.com",
+  "iris.pangalos@gmail.com"
+];
 const emailInWhiteList = ({ email, emailVerified }) =>
   email && emailWhitelist.includes(email) && emailVerified;
 
@@ -12,7 +17,7 @@ exports.processSignUp = functions.auth.user().onCreate(async user => {
   const customClaims = { authorized: true };
   try {
     console.log("Email in whitelist, creating account.");
-    
+
     const accountRef = admin.database().ref(`accounts/${user.uid}`);
     accountRef.set({
       id: user.uid,
