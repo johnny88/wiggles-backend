@@ -35,8 +35,18 @@ exports.afterImageUpload = functions.storage
     }
 
     const id = uuidv4();
+    const postId = uuidv4();
     const timestamp = path.basename(object.name, path.extname(object.name));
+    const postRef = admin.database().ref(`images/${postId}`);
     const imageRef = admin.database().ref(`images/${id}`);
+
+    postRef.set({
+      id: postId,
+      refId: id,
+      userId: object.metadata.userId,
+      timestamp,
+      type: "image"
+    });
 
     imageRef.set({
       id,
