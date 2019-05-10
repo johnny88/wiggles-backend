@@ -5,3 +5,5 @@ services:
     build: ./
     volumes:
       - ./:/app
+      - /app/functions/node_modules
+      - ~/.config:/root/.config
