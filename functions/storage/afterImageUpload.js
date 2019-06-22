@@ -35,8 +35,10 @@ exports.afterImageUpload = functions.storage
     }
 
     const id = uuidv4();
+    const postId = uuidv4();
     const timestamp = path.basename(object.name, path.extname(object.name));
     const imageRef = admin.database().ref(`images/${id}`);
+    const postRef = admin.database().ref(`posts/${postId}`);
 
     imageRef.set({
       id,
@@ -51,6 +53,7 @@ exports.afterImageUpload = functions.storage
       status: statusMessages.GENERATING_IMAGES
     });
 
+
     const [web, thumbnail] = await Promise.all([
       convertImage(object, WEB_PREFIX),
       convertImage(object, THUMB_PREFIX, true)
@@ -58,12 +61,20 @@ exports.afterImageUpload = functions.storage
 
     if (!thumbnail || !web) return;
 
-    return imageRef.update({
+    imageRef.update({
       thumbnail,
       web,
       status: statusMessages.FINISHED,
       uploadFinished: true
     });
+
+    postRef.set({
+      id: postId,
+      refId: id,
+      timestamp,
+      type: 'image',
+      userId: object.metadata.userId,
+    })
   });
 
 const isObjectImage = ({ contentType }) => contentType.startsWith("image/");

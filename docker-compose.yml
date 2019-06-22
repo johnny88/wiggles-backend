@@ -1,7 +1,14 @@
 version: "3.7"
 
 services:
-  cloud-functions:
+  cloud_functions:
     build: ./
+    command: yarn serve -o 0.0.0.0
+    ports:
+      - "5000:5000"
     volumes:
+      - ~/.config:/root/.config
       - ./:/app
+      - /app/functions/node_modules
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/root/.config/wiggles-service-account.json
