@@ -1,12 +1,12 @@
-FROM node:8
-
-RUN yarn global add firebase-tools
+FROM node:10
 
 RUN mkdir /app
-WORKDIR /app
-RUN mkdir functions
 
-ADD functions/package.json functions/package.json
-ADD functions/yarn.lock functions/yarn.lock
+RUN yarn global add firebase-tools 
 
-RUN cd functions && yarn
+WORKDIR /app/functions
+
+ADD functions/package.json package.json
+ADD functions/yarn.lock yarn.lock
+
+RUN yarn
