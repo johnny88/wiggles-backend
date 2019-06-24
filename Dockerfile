@@ -10,4 +10,3 @@ ADD functions/package.json package.json
 ADD functions/yarn.lock yarn.lock
 
 RUN yarn
-

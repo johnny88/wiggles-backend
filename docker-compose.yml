@@ -12,3 +12,4 @@ services:
       - /app/functions/node_modules
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/root/.config/wiggles-service-account.json
+      - ~/.config:/root/.config
