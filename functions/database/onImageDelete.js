@@ -1,10 +1,10 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
-exports.onDeleteImage = functions.database
-  .ref("/images/{imageId}")
+exports.onDeleteImage = functions.firestore
+  .document("/images/{imageId}")
   .onDelete(async snap => {
-    const imageObj = snap.val();
+    const imageObj = snap.data();
     console.log("Deleting images for: ", imageObj.path);
 
     const bucket = admin.storage().bucket("wiggles-f0bd9.appspot.com");
