@@ -62,6 +62,7 @@ exports.afterImageUpload = functions.storage
       status: statusMessages.GENERATING_IMAGES
     });
 
+
     const [web, thumbnail] = await Promise.all([
       convertImage(object, WEB_PREFIX),
       convertImage(object, THUMB_PREFIX, true)
@@ -69,12 +70,20 @@ exports.afterImageUpload = functions.storage
 
     if (!thumbnail || !web) return;
 
-    return imageRef.update({
+    imageRef.update({
       thumbnail,
       web,
       status: statusMessages.FINISHED,
       uploadFinished: true
     });
+
+    postRef.set({
+      id: postId,
+      refId: id,
+      timestamp,
+      type: 'image',
+      userId: object.metadata.userId,
+    })
   });
 
 const isObjectImage = ({ contentType }) => contentType.startsWith("image/");
