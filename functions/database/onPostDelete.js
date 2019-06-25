@@ -1,18 +1,17 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
-exports.onPostDelete = functions.database
-  .ref("/post/{postId}")
+exports.onPostDelete = functions.firestore
+  .document("/post/{postId}")
   .onDelete(async snap => {
-    const post = snap.val();
+    const db = admin.firestore();
+    const post = snap.data();
     if (post.type === 'image') {
-      const imageRef = admin.database().ref(`images/${post.refId}`)
-      imageRef.remove();
+      await db.collection('images').doc(post.refId).delete();
       return;
     }
     if (post.type === 'quote') {
-      const quoteRef = admin.database().ref(`quotes/${post.refId}`)
-      quoteRef.remove();
+      await db.collection('quote').doc(post.refId).delete();
       return
     }
   });

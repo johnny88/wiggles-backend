@@ -37,10 +37,11 @@ exports.afterImageUpload = functions.storage
     const id = uuidv4();
     const postId = uuidv4();
     const timestamp = path.basename(object.name, path.extname(object.name));
-    const postRef = admin.database().ref(`images/${postId}`);
-    const imageRef = admin.database().ref(`images/${id}`);
 
-    postRef.set({
+    const db = admin.firestore();
+    const imageRef = db.collection('images').doc(id);
+
+    db.collection('posts').doc(postId).set({
       id: postId,
       refId: id,
       userId: object.metadata.userId,
