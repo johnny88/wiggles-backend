@@ -40,16 +40,9 @@ exports.afterImageUpload = functions.storage
 
     const db = admin.firestore();
     const imageRef = db.collection('images').doc(id);
+    const postRef = db.collection('posts').doc(postId);
 
-    db.collection('posts').doc(postId).set({
-      id: postId,
-      refId: id,
-      userId: object.metadata.userId,
-      timestamp,
-      type: "image"
-    });
-
-    imageRef.set({
+    await imageRef.set({
       id,
       path: object.name,
       contentType: object.contentType,
@@ -58,7 +51,7 @@ exports.afterImageUpload = functions.storage
       uploadFinished: false
     });
 
-    imageRef.update({
+    await imageRef.update({
       status: statusMessages.GENERATING_IMAGES
     });
 
@@ -70,14 +63,14 @@ exports.afterImageUpload = functions.storage
 
     if (!thumbnail || !web) return;
 
-    imageRef.update({
+    await imageRef.update({
       thumbnail,
       web,
       status: statusMessages.FINISHED,
       uploadFinished: true
     });
 
-    postRef.set({
+    await postRef.set({
       id: postId,
       refId: id,
       timestamp,
