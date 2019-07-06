@@ -5,7 +5,8 @@ const emailWhitelist = [
   "jpangs88@gmail.com",
   "susannebjorkblom@hotmail.com",
   "lndpangalos@gmail.com",
-  "iris.pangalos@gmail.com"
+  "iris.pangalos@gmail.com",
+  "19pangalos@gmail.com"
 ];
 const emailInWhiteList = ({ email, emailVerified }) =>
   email && emailWhitelist.includes(email) && emailVerified;
@@ -17,9 +18,9 @@ exports.processSignUp = functions.auth.user().onCreate(async user => {
   const customClaims = { authorized: true };
   try {
     console.log("Email in whitelist, creating account.");
-
-    const accountRef = admin.database().ref(`accounts/${user.uid}`);
-    accountRef.set({
+    const db = admin.firestore();
+    const accountRef = db.collection('accounts').doc(user.uid);
+    await accountRef.set({
       id: user.uid,
       displayName: user.displayName,
       email: user.email,
@@ -28,8 +29,9 @@ exports.processSignUp = functions.auth.user().onCreate(async user => {
 
     console.log("Adding custom claims.");
     await admin.auth().setCustomUserClaims(user.uid, customClaims);
-    const metadataRef = admin.database().ref("metadata/" + user.uid);
-    return metadataRef.set({ refreshTime: new Date().getTime() });
+    const metadataRef = db.collection("metadata").doc(user.uid);
+    await metadataRef.set({ refreshTime: new Date().getTime() });
+    return;
   } catch (error) {
     console.log(error);
   }

@@ -35,10 +35,14 @@ exports.afterImageUpload = functions.storage
     }
 
     const id = uuidv4();
+    const postId = uuidv4();
     const timestamp = path.basename(object.name, path.extname(object.name));
-    const imageRef = admin.database().ref(`images/${id}`);
 
-    imageRef.set({
+    const db = admin.firestore();
+    const imageRef = db.collection('images').doc(id);
+    const postRef = db.collection('posts').doc(postId);
+
+    await imageRef.set({
       id,
       path: object.name,
       contentType: object.contentType,
@@ -47,9 +51,10 @@ exports.afterImageUpload = functions.storage
       uploadFinished: false
     });
 
-    imageRef.update({
+    await imageRef.update({
       status: statusMessages.GENERATING_IMAGES
     });
+
 
     const [web, thumbnail] = await Promise.all([
       convertImage(object, WEB_PREFIX),
@@ -58,12 +63,20 @@ exports.afterImageUpload = functions.storage
 
     if (!thumbnail || !web) return;
 
-    return imageRef.update({
+    await imageRef.update({
       thumbnail,
       web,
       status: statusMessages.FINISHED,
       uploadFinished: true
     });
+
+    await postRef.set({
+      id: postId,
+      refId: id,
+      timestamp,
+      type: 'image',
+      userId: object.metadata.userId,
+    })
   });
 
 const isObjectImage = ({ contentType }) => contentType.startsWith("image/");
