@@ -6,7 +6,10 @@ const emailWhitelist = [
   "susannebjorkblom@hotmail.com",
   "lndpangalos@gmail.com",
   "iris.pangalos@gmail.com",
-  "19pangalos@gmail.com"
+  "19pangalos@gmail.com",
+  "seanmheff@gmail.com",
+  "joan.manuel.valdes@gmail.com",
+  "gujehoglund@hotmail.com"
 ];
 const emailInWhiteList = ({ email, emailVerified }) =>
   email && emailWhitelist.includes(email) && emailVerified;
