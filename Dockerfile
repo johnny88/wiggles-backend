@@ -9,4 +9,6 @@ WORKDIR /app/functions
 ADD functions/package.json package.json
 ADD functions/yarn.lock yarn.lock
 
+EXPOSE 9005
+
 RUN yarn

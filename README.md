@@ -11,3 +11,7 @@ docker-compose build
 docker-compose run --rm cloud-functions /bin/bash -c "cd functions && yarn deploy"
 ```
 
+# How to develop
+
+First you are going to need to create a service account [here](https://cloud.google.com/docs/authentication/getting-started).
+
