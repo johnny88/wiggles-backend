@@ -67,3 +67,6 @@ node_modules/
 # vim temp files
 *.swp
 *.swo
+
+# firebase config files
+.config

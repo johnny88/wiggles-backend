@@ -4,14 +4,12 @@ services:
   cloud_functions:
     build: ./
     command: yarn serve
-    user: node
     ports:
       - "5000:5000"
       - "9005:9005"
     volumes:
-      - ~/.config/wiggles-service-account.json:/home/node/wiggles-service-account.json
       - ./:/app
       - /app/functions/node_modules
+      - ./.config:/root/.config
     environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=/home/node/wiggles-service-account.json
-      - FIREBASE_TOKEN
+      - GOOGLE_APPLICATION_CREDENTIALS=/root/.config/service-account.json
