@@ -67,3 +67,5 @@ node_modules/
 # vim temp files
 *.swp
 *.swo
+
+.config/
