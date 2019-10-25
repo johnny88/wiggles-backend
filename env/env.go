@@ -3,8 +3,8 @@ package env
 import (
 	"log"
 	"os"
- 	
-    "github.com/joho/godotenv"
+
+	"github.com/joho/godotenv"
 )
 
 // Conf is the config interface
@@ -18,12 +18,16 @@ type Config struct {
 }
 
 // Populate reads local env file and populates it the config struct
-func (c Config) Populate() error {
-	err := godotenv.Load()
-  	if err != nil {
-		log.Println("Error loading .env file")
-		return err
-	}
+func (c *Config) Populate() error {
 	c.ProjectID = os.Getenv("PROJECT_ID")
+	if c.ProjectID == "" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Println("Error loading .env file")
+			return err
+		}
+		c.ProjectID = os.Getenv("PROJECT_ID")
+	}
+
 	return nil
 }

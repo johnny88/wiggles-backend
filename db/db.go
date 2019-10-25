@@ -19,13 +19,13 @@ type (
 	// Conn is the connection struct that implements the DB interface
 	Conn struct {
 		Client *firestore.Client
-		Ctx context.Context
+		Ctx    context.Context
 	}
 )
 
 // Connect creates the connection to the firebase db based on the
 // ProjectID field
-func (conn *Conn)Connect() error {
+func (conn *Conn) Connect() error {
 	c := env.Config{}
 	err := c.Populate()
 	if err != nil {
@@ -33,6 +33,7 @@ func (conn *Conn)Connect() error {
 	}
 
 	conn.Ctx = context.Background()
+
 	fire := &firebase.Config{ProjectID: c.ProjectID}
 	app, err := firebase.NewApp(conn.Ctx, fire)
 	if err != nil {
@@ -49,6 +50,6 @@ func (conn *Conn)Connect() error {
 
 // Close is a wrapper for the firebase close function
 // used mostly for mocking purposes
-func (conn *Conn)Close() {
+func (conn *Conn) Close() {
 	conn.Client.Close()
 }

@@ -11,3 +11,10 @@ docker-compose build
 docker-compose run --rm cloud-functions /bin/bash -c "cd functions && yarn deploy"
 ```
 
+```
+docker build -t wiggles-backend-go:latest .
+docker run -p 8080:8080 \
+-v ~/.config/wiggles-service-account.json:/wiggles-service-account.json \
+-e GOOGLE_APPLICATION_CREDENTIALS:/wiggles-service-account.json \
+wiggles-backend-go
+```
